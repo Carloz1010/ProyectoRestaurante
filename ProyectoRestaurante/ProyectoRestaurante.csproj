@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Domain\Entities\" />
+    <Folder Include="Infrastructure\Data\" />
+    <Folder Include="Pages\Admin\Categorias\" />
+    <Folder Include="Pages\Admin\Ordenes\" />
+    <Folder Include="Pages\Admin\Productos\" />
+    <Folder Include="Pages\Catalogo\" />
+    <Folder Include="Pages\Carrito\" />
+    <Folder Include="Pages\Checkout\" />
+    <Folder Include="Shared\" />
+    <Folder Include="Services\" />
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
+</Project>
