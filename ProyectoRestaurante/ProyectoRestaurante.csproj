@@ -7,17 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Entities\" />
-    <Folder Include="Infrastructure\Data\" />
+	<Folder Include="Domain\Entities\" />
     <Folder Include="Pages\Admin\Categorias\" />
     <Folder Include="Pages\Admin\Ordenes\" />
     <Folder Include="Pages\Admin\Productos\" />
-    <Folder Include="Pages\Catalogo\" />
     <Folder Include="Pages\Carrito\" />
     <Folder Include="Pages\Checkout\" />
     <Folder Include="Shared\" />
-    <Folder Include="Services\" />
     <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
   </ItemGroup>
 
 </Project>

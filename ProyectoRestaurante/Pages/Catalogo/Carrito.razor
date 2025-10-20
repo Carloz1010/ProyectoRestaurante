@@ -1,0 +1,11 @@
+﻿@using ProyectoRestaurante.Services.Carrito
+@inject ICarritoService CarritoService
+@page "/carrito"
+
+<p>Subtotal: @CarritoService.Subtotal().ToString("C")</p>
+<p>IVA (19%): @CarritoService.Impuestos(0.19m).ToString("C")</p>
+<p>Total: @CarritoService.Total(0.19m).ToString("C")</p>
+
+@code {
+
+}
