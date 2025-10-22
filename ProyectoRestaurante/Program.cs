@@ -1,33 +1,25 @@
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using ProyectoRestaurante.Components;
 using ProyectoRestaurante.Infrastructure.Data;
-using System;
 using ProyectoRestaurante.Services.Catalogo;
 using ProyectoRestaurante.Services.Ordenes;
 using ProyectoRestaurante.Services.Carrito;
-using ProyectoRestaurante;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
 {
     options.UseSqlite(connectionString);
-    // options.EnableSensitiveDataLogging(false);
+
 });
 
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<IOrdenesService, OrdenesService>();
 builder.Services.AddScoped<ICarritoService, CarritoService>();
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
@@ -36,7 +28,7 @@ using (var scope = app.Services.CreateScope())
     var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
     using var dbContext = dbContextFactory.CreateDbContext();
 
-    var seeder = new DataSeeder(dbContext);     
+    var seeder = new DataSeeder(dbContext);
     await seeder.SeedAsync();
 }
 

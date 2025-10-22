@@ -1,0 +1,117 @@
+﻿
+@page "/checkout"
+@using System.ComponentModel.DataAnnotations
+@using ProyectoRestaurante.Services.Carrito
+@using ProyectoRestaurante.Services.Catalogo
+@using ProyectoRestaurante.Services.Ordenes
+@using ProyectoRestaurante.Services.DTOs
+@inject ICatalogoService CatalogoService
+@inject ICarritoService CarritoService
+@inject IOrdenesService OrdenesService
+@inject NavigationManager Nav
+
+<h3>Checkout</h3>
+
+@if (confirmacion is not null)
+{
+    <div class="card">
+        <h4>¡Orden creada!</h4>
+        <p>Número: <b>@confirmacion.OrdenId</b></p>
+        <p>Fecha: <b>@confirmacion.FechaLocal</b></p>
+        <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
+    </div>
+}
+else if (!CarritoService.Items.Any())
+{
+    <p>No tienes items en el carrito.</p>
+    <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Ir al catálogo</button>
+}
+else
+{
+    <EditForm Model="@form" OnValidSubmit="@CrearOrden">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form">
+            <div>
+                <label>Nombre *</label>
+                <InputText @bind-Value="form.Nombre" />
+                <ValidationMessage For="@(()=> form.Nombre)" />
+            </div>
+            <div>
+                <label>Teléfono *</label>
+                <InputText @bind-Value="form.Telefono" />
+                <ValidationMessage For="@(()=> form.Telefono)" />
+            </div>
+            <div>
+                <label>Email</label>
+                <InputText @bind-Value="form.Email" />
+                <ValidationMessage For="@(()=> form.Email)" />
+            </div>
+            <div>
+                <label>Dirección</label>
+                <InputText @bind-Value="form.Direccion" />
+            </div>
+        </div>
+
+        <div style="margin-top:1rem">
+            <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>
+            <p>IVA (19%): <b>@CarritoService.Impuestos(TasaIva).ToString("C")</b></p>
+            <p>Total: <b>@CarritoService.Total(TasaIva).ToString("C")</b></p>
+        </div>
+
+        <button type="submit">Confirmar pedido</button>
+        <button type="button" @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al carrito</button>
+    </EditForm>
+}
+
+@code{
+    const decimal TasaIva = 0.19m;
+
+    CheckoutForm form = new();
+    ConfirmacionOrden? confirmacion;
+
+    class CheckoutForm
+    {
+        [Required, MinLength(2)]
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required, Phone]
+        public string Telefono { get; set; } = string.Empty;
+
+        [EmailAddress]
+        public string? Email { get; set; }
+
+        public string? Direccion { get; set; }
+    }
+
+    class ConfirmacionOrden
+    {
+        public int OrdenId { get; set; }
+        public string FechaLocal { get; set; } = string.Empty;
+    }
+
+    private async Task CrearOrden()
+    {
+        var dto = new CrearOrdenDTO
+        {
+            ClienteNombre = form.Nombre,
+            Telefono = form.Telefono,
+            Email = form.Email,
+            Direccion = form.Direccion,
+            TasaImpuesto = TasaIva,
+            Items = CarritoService.Items.Select(i => new CrearOrdenItemDTO
+            {
+                ProductoId = i.ProductoId,
+                Cantidad = i.Cantidad,
+                PrecioUnitario = i.PrecioUnitario
+            }).ToList()
+        };
+
+        var id = await OrdenesService.CrearOrdenAsync(dto);
+        var fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+
+        CarritoService.Vaciar();
+        confirmacion = new ConfirmacionOrden { OrdenId = id, FechaLocal = fecha };
+    }
+}

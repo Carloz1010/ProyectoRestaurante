@@ -1,0 +1,65 @@
+﻿@page "/"
+@page "/catalogo"
+@using ProyectoRestaurante.Services.Carrito
+@using ProyectoRestaurante.Services.Catalogo
+@using ProyectoRestaurante.Services.DTOs
+@inject ICatalogoService CatalogoService
+@inject ICarritoService CarritoService
+@inject NavigationManager Nav
+
+<h3>Catálogo</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div style="background:#d4edda;color:#155724;padding:10px;border-radius:5px;margin:10px 0;">
+        @mensaje
+    </div>
+}
+
+@if (productos is null)
+{
+    <p>Cargando…</p>
+}
+else if (!productos.Any())
+{
+    <p>No hay productos.</p>
+}
+else
+{
+    <div class="grid">
+        @foreach (var p in productos)
+        {
+            <div class="card">
+
+                <img src="@($"/img/{p.ImagenArchivo}")" alt="Imagen de @p.Nombre" style="width:100%;max-width:200px;display:block;margin-bottom:10px;" />
+                <h4>@p.Nombre</h4>
+                <p>@p.Descripcion</p>
+                <p><b>@p.Precio.ToString("C")</b></p>
+                <div class="row">
+                    <button @onclick="() => Agregar(p)">Agregar</button>
+                    <button @onclick="@(() => Nav.NavigateTo($"/producto/{p.Id}"))">Ver</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    List<ProductoDTO>? productos;
+    string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+
+    private async Task Cargar()
+        => productos = await CatalogoService.ListarProductosAsync(null, null);
+
+    private void Agregar(ProductoDTO p)
+    {
+        CarritoService.Agregar(p, 1);
+        mensaje = $"El producto '{p.Nombre}' fue agregado al carrito.";
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,49 @@
+﻿@page "/producto/{id:int}"
+@using ProyectoRestaurante.Services.Carrito
+@using ProyectoRestaurante.Services.Catalogo
+@using ProyectoRestaurante.Services.DTOs
+@inject ICatalogoService CatalogoService
+@inject ICarritoService CarritoService
+@inject NavigationManager Nav
+
+<h3>Detalle del producto</h3>
+
+@if (producto is null)
+{
+    <p>Cargando…</p>
+}
+else
+{
+    <div class="card">
+        <img src="@($"/img/{producto.ImagenArchivo}")" alt="Imagen de @producto.Nombre" style="width:100%;max-width:200px;display:block;margin-bottom:10px;" />
+        <h4>@producto.Nombre</h4>
+        <p>@producto.Descripcion</p>
+        <p><b>@producto.Precio.ToString("C")</b></p>
+
+        <div>
+            <label>Cantidad: </label>
+            <input type="number" min="1" @bind="cantidad" />
+        </div>
+
+        <div class="row" style="margin-top:.5rem">
+            <button @onclick="Agregar">Agregar al carrito</button>
+            <button @onclick="@(() => Nav.NavigateTo("/carrito"))">Ver carrito</button>
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter] public int id { get; set; }
+    ProductoDTO? producto;
+    int cantidad = 1;
+
+    protected override async Task OnInitializedAsync()
+        => producto = await CatalogoService.ObtenerProductoAsync(id);
+
+    private void Agregar()
+    {
+        if (producto is null || cantidad <= 0) return;
+        CarritoService.Agregar(producto, cantidad);
+    }
+}
+

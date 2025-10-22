@@ -8,11 +8,6 @@
 
   <ItemGroup>
 	<Folder Include="Domain\Entities\" />
-    <Folder Include="Pages\Admin\Categorias\" />
-    <Folder Include="Pages\Admin\Ordenes\" />
-    <Folder Include="Pages\Admin\Productos\" />
-    <Folder Include="Pages\Carrito\" />
-    <Folder Include="Pages\Checkout\" />
     <Folder Include="Shared\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>

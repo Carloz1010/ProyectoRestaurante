@@ -1,0 +1,63 @@
+﻿@page "/carrito"
+@using ProyectoRestaurante.Services.Carrito
+@inject ICarritoService CarritoService
+@inject NavigationManager Nav
+
+<h3>Carrito</h3>
+
+@if (!CarritoService.Items.Any())
+{
+    <p>Tu carrito está vacío.</p>
+    <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var i in CarritoService.Items)
+        {
+            <tr>
+                <td>@i.Nombre</td>
+                <td>@i.PrecioUnitario.ToString("C")</td>
+                <td>
+                    <input type="number" min="1" value="@i.Cantidad"
+                           @onchange="(e)=> CambiarCantidad(i.ProductoId, e)" />
+                </td>
+                <td>@i.Subtotal.ToString("C")</td>
+                <td><button @onclick="() => Quitar(i.ProductoId)">Quitar</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <div style="margin-top:1rem">
+        <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>
+        <p>IVA (19%): <b>@CarritoService.Impuestos(TasaIva).ToString("C")</b></p>
+        <p>Total: <b>@CarritoService.Total(TasaIva).ToString("C")</b></p>
+    </div>
+
+    <div class="row" style="margin-top:.5rem">
+        <button @onclick="@(() => Nav.NavigateTo("/checkout"))">Continuar al Checkout</button>
+        <button @onclick="Vaciar">Vaciar</button>
+    </div>
+}
+
+@code{
+    const decimal TasaIva = 0.19m;
+
+    void Quitar(int id) { CarritoService.Quitar(id); StateHasChanged(); }
+
+    void Vaciar() { CarritoService.Vaciar(); StateHasChanged(); }
+
+    void CambiarCantidad(int id, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var cant))
+            CarritoService.ActualizarCantidad(id, cant);
+        StateHasChanged();
+    }
+}

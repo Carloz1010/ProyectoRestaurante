@@ -34,6 +34,7 @@ namespace ProyectoRestaurante.Services.Catalogo
                     Nombre = p.Nombre,
                     Descripcion = p.Descripcion,
                     Precio = p.Precio,
+                    ImagenArchivo = p.ImagenArchivo,
                     Activo = p.Activo,
                     CategoriaId = p.CategoriaId,
                     CategoriaNombre = p.Categoria.Nombre
@@ -52,6 +53,7 @@ namespace ProyectoRestaurante.Services.Catalogo
                     Nombre = p.Nombre,
                     Descripcion = p.Descripcion,
                     Precio = p.Precio,
+                    ImagenArchivo = p.ImagenArchivo,
                     Activo = p.Activo,
                     CategoriaId = p.CategoriaId,
                     CategoriaNombre = p.Categoria.Nombre
