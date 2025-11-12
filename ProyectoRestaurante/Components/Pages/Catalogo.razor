@@ -11,7 +11,7 @@
 
 @if (!string.IsNullOrEmpty(mensaje))
 {
-    <div style="background:#d4edda;color:#155724;padding:10px;border-radius:5px;margin:10px 0;">
+    <div>
         @mensaje
     </div>
 }
@@ -26,16 +26,15 @@ else if (!productos.Any())
 }
 else
 {
-    <div class="grid">
+    <div>
         @foreach (var p in productos)
         {
-            <div class="card">
-
-                <img src="@($"/img/{p.ImagenArchivo}")" alt="Imagen de @p.Nombre" style="width:100%;max-width:200px;display:block;margin-bottom:10px;" />
+            <div>
+                <img src="@($"/img/{p.ImagenArchivo}")" alt="Imagen de @p.Nombre" />
                 <h4>@p.Nombre</h4>
                 <p>@p.Descripcion</p>
                 <p><b>@p.Precio.ToString("C")</b></p>
-                <div class="row">
+                <div>
                     <button @onclick="() => Agregar(p)">Agregar</button>
                     <button @onclick="@(() => Nav.NavigateTo($"/producto/{p.Id}"))">Ver</button>
                 </div>

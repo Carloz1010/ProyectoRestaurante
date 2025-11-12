@@ -35,13 +35,13 @@ else
         </tbody>
     </table>
 
-    <div style="margin-top:1rem">
+    <div>
         <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>
         <p>IVA (19%): <b>@CarritoService.Impuestos(TasaIva).ToString("C")</b></p>
         <p>Total: <b>@CarritoService.Total(TasaIva).ToString("C")</b></p>
     </div>
 
-    <div class="row" style="margin-top:.5rem">
+    <div>
         <button @onclick="@(() => Nav.NavigateTo("/checkout"))">Continuar al Checkout</button>
         <button @onclick="Vaciar">Vaciar</button>
     </div>
