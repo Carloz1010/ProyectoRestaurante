@@ -1,0 +1,13 @@
+﻿@page "/admin/logout"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var customProvider = (AutenticacionStateProvider)AuthStateProvider;
+        await customProvider.Logout();
+        Nav.NavigateTo("/");
+    }
+}

@@ -11,6 +11,7 @@ namespace ProyectoRestaurante.Infrastructure.Data
         public DbSet<Producto> Productos => Set<Producto>();
         public DbSet<Orden> Ordenes => Set<Orden>();
         public DbSet<OrdenItem> OrdenItems => Set<OrdenItem>();
+        public DbSet<UsuarioAdministrador> UsuariosAdministradores => Set<UsuarioAdministrador>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

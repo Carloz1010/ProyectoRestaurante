@@ -15,7 +15,18 @@
 else
 {
     <div>
-        <img src="@($"/img/{producto.ImagenArchivo}")" alt="Imagen de @producto.Nombre" />
+        @if (!string.IsNullOrEmpty(producto.ImagenArchivo))
+        {
+            <img src="@($"/img/{producto.ImagenArchivo}")"
+                 alt="Imagen de @producto.Nombre"
+                 style="max-width: 200px; max-height: 200px; object-fit: cover;" />
+        }
+        else
+        {
+            <img src="img/placeholder.png"
+                 alt="Sin imagen"
+                 style="max-width: 200px; max-height: 200px; object-fit: cover;" />
+        }
         <h4>@producto.Nombre</h4>
         <p>@producto.Descripcion</p>
         <p><b>@producto.Precio.ToString("C")</b></p>

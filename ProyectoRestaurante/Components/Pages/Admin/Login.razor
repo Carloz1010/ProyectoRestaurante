@@ -1,0 +1,70 @@
+@page "/admin/login"
+@using System.ComponentModel.DataAnnotations
+@using ProyectoRestaurante.Services.Autenticacion
+@using System.Security.Claims
+@inject IAutenticacionService AutenticacionService
+@inject AutenticacionStateProvider AuthProvider
+@inject NavigationManager Nav
+
+<h3>Login Administrador</h3>
+@if (!string.IsNullOrEmpty(error))
+{
+    <p class="text-danger">@error</p>
+}
+
+<EditForm Model="model" OnValidSubmit="OnLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Usuario</label>
+        <InputText class="form-control" @bind-Value="model.UserName" />
+    </div>
+    <div class="mb-3">
+        <label>Contraseña</label>
+        <InputText type="password" class="form-control" @bind-Value="model.Contraseña" />
+    </div>
+    <button class="btn btn-primary" type="submit">Ingresar</button>
+</EditForm>
+
+@code {
+    private LoginModel model = new();
+    private string? error;
+
+    private async Task OnLogin()
+    {
+        var user = await AutenticacionService.ValidarCredencialesAsync(model.UserName, model.Contraseña);
+
+        if (user is null)
+        {
+            error = "Usuario o contraseña inválidos";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Role, "Admin")
+        };
+        var identity = new ClaimsIdentity(claims, "CustomAuth");
+        var principal = new ClaimsPrincipal(identity);
+
+        await AuthProvider.Login(principal);
+        Nav.NavigateTo("/admin/ordenes");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Nav.NavigateTo("/admin/ordenes");
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required] public string UserName { get; set; } = string.Empty;
+        [Required] public string Contraseña { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,139 @@
+﻿@page "/admin/usuarios"
+@using ProyectoRestaurante.Domain.Entities
+@using ProyectoRestaurante.Services.Autenticacion
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@inject IAutenticacionService AutenticacionService
+@inject IJSRuntime Js
+
+<h3>Usuarios Administradores</h3>
+
+@if (usuarios is null)
+{
+    <p>Cargando…</p>
+}
+else
+{
+    <ul>
+        @foreach (var u in usuarios)
+        {
+            <li>
+                @u.UserName
+                @if (!u.Activo)
+                {
+                    <span class="text-muted">(inactivo)</span>
+                }
+
+                <button class="btn btn-danger btn-sm ms-2"
+                        @onclick="() => Eliminar(u)">
+                    Eliminar
+                </button>
+            </li>
+        }
+    </ul>
+}
+
+@if (!string.IsNullOrEmpty(mensajeEliminar))
+{
+    <div class="alert alert-success">@mensajeEliminar</div>
+}
+
+@if (!string.IsNullOrEmpty(mensajeEliminarError))
+{
+    <div class="alert alert-danger">@mensajeEliminarError</div>
+}
+
+<h5>Crear nuevo</h5>
+
+<EditForm Model="nuevo" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-2">
+        <label>Usuario</label>
+        <InputText class="form-control" @bind-Value="nuevo.UserName" />
+    </div>
+    <div class="mb-2">
+        <label>Contraseña</label>
+        <InputText type="password" class="form-control" @bind-Value="nuevo.Contraseña" />
+    </div>
+    <button class="btn btn-primary" type="submit">Crear</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensajeOk))
+{
+    <div class="alert alert-success">@mensajeOk</div>
+}
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">@mensajeError</div>
+}
+
+@code {
+    private List<UsuarioAdministrador>? usuarios;
+    private NuevoModel nuevo = new();
+
+    private string? mensajeOk;
+    private string? mensajeError;
+    private string? mensajeEliminar;
+    private string? mensajeEliminarError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarios = await AutenticacionService.ObtenerAdminAsync();
+    }
+
+    private async Task Crear()
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        try
+        {
+            await AutenticacionService.CrearAdminAsync(nuevo.UserName, nuevo.Contraseña);
+            usuarios = await AutenticacionService.ObtenerAdminAsync();
+            nuevo = new NuevoModel();
+            mensajeOk = "Usuario creado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "No se pudo crear el usuario.";
+        }
+    }
+
+    private async Task Eliminar(UsuarioAdministrador usuario)
+    {
+        mensajeEliminar = null;
+        mensajeEliminarError = null;
+
+        bool confirmar = await Js.InvokeAsync<bool>(
+            "confirm",
+            $"¿Seguro que deseas eliminar el usuario '{usuario.UserName}'?"
+        );
+
+        if (!confirmar)
+            return;
+
+        try
+        {
+            await AutenticacionService.EliminarAdminAsync(usuario.Id);
+            usuarios = await AutenticacionService.ObtenerAdminAsync();
+            mensajeOk = "Usuario eliminado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "No se pudo eliminar el usuario";
+        }
+    }
+
+    public class NuevoModel
+    {
+        [Required]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required]
+        public string Contraseña { get; set; } = string.Empty;
+    }
+}

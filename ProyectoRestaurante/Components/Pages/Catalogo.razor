@@ -30,7 +30,19 @@ else
         @foreach (var p in productos)
         {
             <div>
-                <img src="@($"/img/{p.ImagenArchivo}")" alt="Imagen de @p.Nombre" />
+                @if (!string.IsNullOrEmpty(p.ImagenArchivo))
+                {
+                    <img src="@($"/img/{p.ImagenArchivo}")"
+                         alt="Imagen de @p.Nombre"
+                         style="max-width: 200px; max-height: 200px; object-fit: cover;" />
+                }
+                else
+                {
+                    <img src="img/placeholder.png"
+                         alt="Sin imagen"
+                         style="max-width: 200px; max-height: 200px; object-fit: cover;" />
+                }
+
                 <h4>@p.Nombre</h4>
                 <p>@p.Descripcion</p>
                 <p><b>@p.Precio.ToString("C")</b></p>

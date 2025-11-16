@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using ProyectoRestaurante.Domain.Entities;
 using ProyectoRestaurante.Domain.Enums;
 using ProyectoRestaurante.Infrastructure.Data;
@@ -124,6 +125,35 @@ namespace ProyectoRestaurante.Services.Ordenes
             using var db = await factory.CreateDbContextAsync();
             var o = await db.Ordenes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             return o?.Estado ?? EstadoOrden.Recibida;
+        }
+
+        public async Task<List<OrdenDTO>> ListarOrdenesAsync()
+        {
+            using var db = await factory.CreateDbContextAsync();
+            var ordenes = await db.Ordenes
+                .Include(o => o.Items)
+                .ThenInclude(oi => oi.Producto)
+                .OrderByDescending(o => o.Fecha)
+                .ToListAsync();
+
+            return ordenes.Select(o => new OrdenDTO
+            {
+                Id = o.Id,
+                ClienteNombre = o.ClienteNombre,
+                Fecha = o.Fecha,
+                Estado = o.Estado,
+                Subtotal = o.Subtotal,
+                Impuestos = o.Impuestos,
+                Total = o.Total,
+                Items = o.Items.Select(oi => new OrdenItemDTO
+                {
+                    ProductoId = oi.ProductoId,
+                    Nombre = oi.Producto.Nombre,
+                    Cantidad = oi.Cantidad,
+                    PrecioUnitario = oi.PrecioUnitario
+                }).ToList(),
+                NotasInternas = o.NotasInternas
+            }).ToList();
         }
     }
 }

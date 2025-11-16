@@ -1,0 +1,90 @@
+﻿@page "/admin/ordenes/{id:int}"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@using ProyectoRestaurante.Domain.Enums
+@using ProyectoRestaurante.Services.DTOs
+@using ProyectoRestaurante.Services.Ordenes
+@using System.ComponentModel.DataAnnotations
+@inject IOrdenesService OrdenesService
+@inject NavigationManager Nav
+
+<h3>Detalle Orden #@id</h3>
+
+@if (detalle is null)
+{
+    <p>Cargando…</p>
+}
+else
+{
+    <div class="card p-3">
+        <p><b>Cliente:</b> @detalle.ClienteNombre</p>
+        <p><b>Fecha:</b> @detalle.Fecha.ToString("yyyy-MM-dd HH:mm")</p>
+        <p><b>Estado actual:</b> @detalle.Estado</p>
+
+        <EditForm Model="estadoModel" OnValidSubmit="ActualizarEstado">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label>Nuevo estado</label>
+                <InputSelect class="form-select" @bind-Value="estadoModel.NuevoEstado">
+                    @foreach (var e in estadosPosibles)
+                    {
+                        <option value="@e">@e</option>
+                    }
+                </InputSelect>
+            </div>
+            <button class="btn btn-success" type="submit">Guardar</button>
+            <button class="btn btn-secondary ms-2" type="button" @onclick="Volver">Volver</button>
+        </EditForm>
+
+        <hr />
+        <h5>Ítems</h5>
+        <ul>
+            @foreach (var item in detalle.Items)
+            {
+                <li>@item.Cantidad x @item.Nombre (@item.PrecioUnitario.ToString("C")) = @((item.Cantidad * item.PrecioUnitario).ToString("C"))</li>
+            }
+        </ul>
+        <p class="mt-2"><b>Total: </b>@detalle.Total.ToString("C")</p>
+    </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    private OrdenDTO? detalle;
+    private EstadoOrden[] estadosPosibles = (EstadoOrden[])Enum.GetValues(typeof(EstadoOrden));
+    private EstadoModel estadoModel = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        detalle = await OrdenesService.ObtenerOrdenAsync(id);
+        if (detalle != null)
+        {
+            estadoModel.NuevoEstado = detalle.Estado;
+        }
+        else
+        {
+            estadoModel.NuevoEstado = EstadoOrden.Recibida;
+        }
+    }
+
+    private async Task ActualizarEstado()
+    {
+        await OrdenesService.ActualizarEstadoAsync(id, estadoModel.NuevoEstado);
+        detalle = await OrdenesService.ObtenerOrdenAsync(id);
+    }
+
+    private void Volver()
+    {
+        Nav.NavigateTo("/admin/ordenes");
+    }
+
+    public class EstadoModel
+    {
+        [Required]
+        public EstadoOrden NuevoEstado { get; set; }
+    }
+}

@@ -10,5 +10,6 @@
         public bool Activo { get; set; }
         public int CategoriaId { get; set; }
         public string CategoriaNombre { get; set; } = string.Empty;
+        public int TiempoPreparacionMin { get; set; }
     }
 }

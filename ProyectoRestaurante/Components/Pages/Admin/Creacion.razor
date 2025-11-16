@@ -1,0 +1,525 @@
+﻿@page "/admin/creacion"
+@rendermode InteractiveServer
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@using ProyectoRestaurante.Services.Catalogo
+@using ProyectoRestaurante.Services.DTOs
+@using System.ComponentModel.DataAnnotations
+@using ProyectoRestaurante.Services.CatalogoAdmin
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Hosting
+@using System.IO
+
+@attribute [Authorize(Roles = "Admin")]
+@inject ICatalogoAdminService CatalogoAdminService
+@inject IJSRuntime Js
+@inject IWebHostEnvironment Env
+
+<h3>Gestión de catálogo (categorías y productos)</h3>
+
+@if (!string.IsNullOrEmpty(mensajeOk))
+{
+    <div class="alert alert-success">@mensajeOk</div>
+}
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">@mensajeError</div>
+}
+
+@if (categorias is null || productos is null)
+{
+    <p>Cargando…</p>
+}
+else
+{
+    <div class="row">
+        <!-- CATEGORÍAS -->
+        <div class="col-md-4">
+            <h5>Categorías</h5>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Activa</th>
+                        <th>Orden</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in categorias)
+                    {
+                        <tr>
+                            <td>@c.Nombre</td>
+                            <td>@(c.Activa ? "Sí" : "No")</td>
+                            <td>@c.Orden</td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary me-1"
+                                        @onclick="() => EditarCategoria(c)">
+                                    Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger"
+                                        @onclick="() => EliminarCategoria(c)">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h6>@(editandoCategoria ? "Editar categoría" : "Nueva categoría")</h6>
+
+            <EditForm Model="categoriaForm" OnValidSubmit="GuardarCategoria">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-2">
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="categoriaForm.Nombre" />
+                    <ValidationMessage For="@(() => categoriaForm.Nombre)" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Orden (opcional)</label>
+                    <InputNumber class="form-control" @bind-Value="categoriaForm.Orden" />
+                </div>
+
+                <div class="form-check mb-2">
+                    <InputCheckbox class="form-check-input" @bind-Value="categoriaForm.Activa" />
+                    <label class="form-check-label">Activa</label>
+                </div>
+
+                <button class="btn btn-primary" type="submit">
+                    @(editandoCategoria ? "Guardar cambios" : "Crear categoría")
+                </button>
+
+                @if (editandoCategoria)
+                {
+                    <button class="btn btn-link" type="button" @onclick="CancelarEditarCategoria">
+                        Cancelar
+                    </button>
+                }
+            </EditForm>
+        </div>
+
+        <!-- PRODUCTOS -->
+        <div class="col-md-8">
+            <h5>Productos</h5>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Prep. (min)</th>
+                        <th>Activo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in productos)
+                    {
+                        <tr>
+                            <td>@p.Nombre</td>
+                            <td>@p.CategoriaNombre</td>
+                            <td>@p.Precio.ToString("C")</td>
+                            <td>@p.TiempoPreparacionMin</td>
+                            <td>@(p.Activo ? "Sí" : "No")</td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary me-1"
+                                        @onclick="() => EditarProducto(p)">
+                                    Editar
+                                </button>
+                                <button class="btn btn-sm btn-warning me-1"
+                                        @onclick="() => CambiarEstadoProducto(p)">
+                                    @(p.Activo ? "Inactivar" : "Activar")
+                                </button>
+                                <button class="btn btn-sm btn-danger"
+                                        @onclick="() => EliminarProducto(p)">
+                                    Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h6>@(editandoProducto ? "Editar producto" : "Nuevo producto")</h6>
+
+            <EditForm Model="productoForm" OnValidSubmit="GuardarProducto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-2">
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="productoForm.Nombre" />
+                    <ValidationMessage For="@(() => productoForm.Nombre)" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Descripción</label>
+                    <InputTextArea class="form-control" @bind-Value="productoForm.Descripcion" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Precio (COP)</label>
+                    <InputNumber class="form-control" @bind-Value="productoForm.Precio" />
+                    <ValidationMessage For="@(() => productoForm.Precio)" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Tiempo preparación (min)</label>
+                    <InputNumber class="form-control" @bind-Value="productoForm.TiempoPreparacionMin" />
+                    <ValidationMessage For="@(() => productoForm.TiempoPreparacionMin)" />
+                </div>
+
+                <div class="mb-2">
+                    <label>Subir imagen (archivo)</label>
+                    <InputFile OnChange="OnImagenSeleccionada" />
+                    <small class="form-text text-muted">
+                        Se guardará en la carpeta <code>wwwroot/img</code>.
+                    </small>
+                </div>
+
+                <div class="mb-2">
+                    <label>O pegar nombre / URL de imagen (opcional)</label>
+                    <InputText class="form-control" @bind-Value="productoForm.ImagenArchivo" />
+                    <small class="form-text text-muted">
+                        Si no subes archivo, se usará este valor.
+                        Si subes archivo, se ignorará esto y se usará el archivo.
+                    </small>
+                </div>
+
+                <div class="mb-2">
+                    <label>Categoría</label>
+                    <InputSelect class="form-select" @bind-Value="productoForm.CategoriaId">
+                        <option value="0">-- Seleccione categoría --</option>
+                        @foreach (var c in categorias)
+                        {
+                            <option value="@c.Id">@c.Nombre</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => productoForm.CategoriaId)" />
+                </div>
+
+                <div class="form-check mb-2">
+                    <InputCheckbox class="form-check-input" @bind-Value="productoForm.Activo" />
+                    <label class="form-check-label">Activo</label>
+                </div>
+
+                <button class="btn btn-primary" type="submit">
+                    @(editandoProducto ? "Guardar cambios" : "Crear producto")
+                </button>
+
+                @if (editandoProducto)
+                {
+                    <button class="btn btn-link" type="button" @onclick="CancelarEditarProducto">
+                        Cancelar
+                    </button>
+                }
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private IBrowserFile? imagenFile;
+    private List<CategoriaDTO>? categorias;
+    private List<ProductoDTO>? productos;
+
+    private CategoriaFormModel categoriaForm = new();
+    private ProductoFormModel productoForm = new();
+
+    private bool editandoCategoria = false;
+    private bool editandoProducto = false;
+
+    private string? mensajeOk;
+    private string? mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        categorias = await CatalogoAdminService.ObtenerCategoriasAsync();
+        productos = await CatalogoAdminService.ObtenerProductosAsync();
+    }
+
+    // --------- Categorías ---------
+
+    private void EditarCategoria(CategoriaDTO dto)
+    {
+        categoriaForm = new CategoriaFormModel
+        {
+            Id = dto.Id,
+            Nombre = dto.Nombre,
+            Activa = dto.Activa,
+            Orden = dto.Orden
+        };
+        editandoCategoria = true;
+    }
+
+    private void CancelarEditarCategoria()
+    {
+        categoriaForm = new CategoriaFormModel();
+        editandoCategoria = false;
+    }
+
+    private async Task GuardarCategoria()
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        try
+        {
+            var dto = new CategoriaDTO
+            {
+                Id = categoriaForm.Id ?? 0,
+                Nombre = categoriaForm.Nombre,
+                Activa = categoriaForm.Activa,
+                Orden = categoriaForm.Orden
+            };
+
+            if (categoriaForm.Id is null || categoriaForm.Id == 0)
+            {
+                await CatalogoAdminService.CrearCategoriaAsync(dto);
+                mensajeOk = "Categoría creada correctamente.";
+            }
+            else
+            {
+                await CatalogoAdminService.ActualizarCategoriaAsync(dto);
+                mensajeOk = "Categoría actualizada correctamente.";
+            }
+
+            categoriaForm = new CategoriaFormModel();
+            editandoCategoria = false;
+            await CargarDatos();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private async Task EliminarCategoria(CategoriaDTO dto)
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        var confirmar = await Js.InvokeAsync<bool>(
+            "confirm",
+            $"¿Eliminar la categoría '{dto.Nombre}'?"
+        );
+
+        if (!confirmar)
+            return;
+
+        try
+        {
+            await CatalogoAdminService.EliminarCategoriaAsync(dto.Id);
+            mensajeOk = "Categoría eliminada.";
+            await CargarDatos();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    // --------- Productos ---------
+
+    private void EditarProducto(ProductoDTO dto)
+    {
+        productoForm = new ProductoFormModel
+        {
+            Id = dto.Id,
+            Nombre = dto.Nombre,
+            Descripcion = dto.Descripcion,
+            Precio = dto.Precio,
+            ImagenArchivo = dto.ImagenArchivo,
+            Activo = dto.Activo,
+            CategoriaId = dto.CategoriaId,
+            TiempoPreparacionMin = dto.TiempoPreparacionMin
+        };
+        editandoProducto = true;
+    }
+
+    private void CancelarEditarProducto()
+    {
+        productoForm = new ProductoFormModel();
+        editandoProducto = false;
+    }
+
+    private async Task GuardarProducto()
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        try
+        {
+            // 1) Imagen: calculamos imagenPath
+            string? imagenPath = productoForm.ImagenArchivo;
+
+            if (imagenFile != null)
+            {
+                // Carpeta física: .../wwwroot/img
+                var webRoot = Env.WebRootPath;
+                if (string.IsNullOrEmpty(webRoot))
+                {
+                    throw new InvalidOperationException("No se pudo determinar la ruta de wwwroot.");
+                }
+
+                var imgFolder = Path.Combine(webRoot, "img");
+                if (!Directory.Exists(imgFolder))
+                {
+                    Directory.CreateDirectory(imgFolder);
+                }
+
+                var extension = Path.GetExtension(imagenFile.Name);
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                var fullPath = Path.Combine(imgFolder, fileName);
+
+                const long MaxFileSize = 10 * 1024 * 1024; // 10 MB
+
+                await using (var stream = File.Create(fullPath))
+                await using (var uploadStream = imagenFile.OpenReadStream(MaxFileSize))
+                {
+                    await uploadStream.CopyToAsync(stream);
+                }
+
+                // En BD guardamos solo el NOMBRE del archivo
+                imagenPath = fileName;
+            }
+
+            // 2) Construir el DTO con la ruta ya calculada
+            var dto = new ProductoDTO
+            {
+                Id = productoForm.Id ?? 0,
+                Nombre = productoForm.Nombre,
+                Descripcion = productoForm.Descripcion ?? string.Empty,
+                Precio = productoForm.Precio,
+                ImagenArchivo = imagenPath, // solo nombre o lo que pegaste
+                Activo = productoForm.Activo,
+                CategoriaId = productoForm.CategoriaId,
+                TiempoPreparacionMin = productoForm.TiempoPreparacionMin
+            };
+
+            // 3) Crear o actualizar
+            if (productoForm.Id is null || productoForm.Id == 0)
+            {
+                await CatalogoAdminService.CrearProductoAsync(dto);
+                mensajeOk = "Producto creado correctamente.";
+            }
+            else
+            {
+                await CatalogoAdminService.ActualizarProductoAsync(dto);
+                mensajeOk = "Producto actualizado correctamente.";
+            }
+
+            // 4) Reset
+            productoForm = new ProductoFormModel();
+            imagenFile = null;
+            editandoProducto = false;
+            await CargarDatos();
+        }
+        catch (IOException)
+        {
+            mensajeError = "La imagen es demasiado grande (máximo 10 MB).";
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error al guardar el producto: " + ex.Message;
+        }
+    }
+
+    private async Task EliminarProducto(ProductoDTO dto)
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        var confirmar = await Js.InvokeAsync<bool>(
+            "confirm",
+            $"¿Eliminar el producto '{dto.Nombre}'?"
+        );
+
+        if (!confirmar)
+            return;
+
+        try
+        {
+            await CatalogoAdminService.EliminarProductoAsync(dto.Id);
+            mensajeOk = "Producto eliminado.";
+            await CargarDatos();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    private async Task CambiarEstadoProducto(ProductoDTO dto)
+    {
+        mensajeOk = null;
+        mensajeError = null;
+
+        try
+        {
+            dto.Activo = !dto.Activo;
+            await CatalogoAdminService.ActualizarProductoAsync(dto);
+            mensajeOk = "Estado del producto actualizado.";
+            await CargarDatos();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
+    }
+
+    // --------- Modelos de formulario ---------
+
+    public class CategoriaFormModel
+    {
+        public int? Id { get; set; }
+
+        [Required]
+        public string Nombre { get; set; } = string.Empty;
+
+        public bool Activa { get; set; } = true;
+
+        public int? Orden { get; set; }
+    }
+
+    public class ProductoFormModel
+    {
+        public int? Id { get; set; }
+
+        [Required]
+        public string Nombre { get; set; } = string.Empty;
+
+        public string? Descripcion { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "El precio debe ser mayor a 0")]
+        public int Precio { get; set; }
+
+        [Range(1, 240, ErrorMessage = "Tiempo de preparación entre 1 y 240 minutos")]
+        public int TiempoPreparacionMin { get; set; } = 10;
+
+        public string? ImagenArchivo { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Seleccione una categoría")]
+        public int CategoriaId { get; set; }
+
+        public bool Activo { get; set; } = true;
+    }
+
+    private void OnImagenSeleccionada(InputFileChangeEventArgs e)
+    {
+        imagenFile = e.File;
+    }
+}
