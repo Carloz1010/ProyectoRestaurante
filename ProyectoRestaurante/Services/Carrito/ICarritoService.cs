@@ -6,8 +6,8 @@ namespace ProyectoRestaurante.Services.Carrito
     {
         IReadOnlyList<CarritoItemDTO> Items { get; }
         int Subtotal();
-        int Impuestos(decimal tasaIva);
-        int Total(decimal tasaIva);
+        int Impuestos(decimal impuesto);
+        int Total();
 
         void Agregar(ProductoDTO p, int cantidad = 1);
         void ActualizarCantidad(int productoId, int nuevaCantidad);

@@ -1,0 +1,74 @@
+﻿@page "/admin/reportes/items-mas-vendidos"
+@using ProyectoRestaurante.Services.DTOs
+@using ProyectoRestaurante.Services.Reporte
+@inject IReporteService ReporteService
+@inject NavigationManager Nav
+
+
+<h3>Ítems más vendidos</h3>
+
+<div class="row">
+    <div class="col">
+        <label>Inicio:</label>
+        <input type="date" @bind="inicio" @bind:format="yyyy-MM-dd" class="form-control" />
+    </div>
+    <div class="col">
+        <label>Fin:</label>
+        <input type="date" @bind="fin" @bind:format="yyyy-MM-dd" class="form-control" />
+    </div>
+</div>
+
+<button class="btn btn-primary mt-3" @onclick="GenerarReporte">Generar</button>
+<button class="btn btn-secondary mt-3 ms-2" @onclick="Volver">Volver</button>
+
+@if (items != null && items.Count > 0)
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad Vendida</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td>@item.ProductoNombre</td>
+                    <td>@item.CantidadVendida</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (items != null && items.Count == 0)
+{
+    <div class="alert alert-info mt-3">
+        No se encontraron ítems vendidos en el rango de fechas seleccionado.
+    </div>
+}
+
+@code {
+    private DateTime inicio = DateTime.Today.AddDays(-30);
+    private DateTime fin = DateTime.Today;
+
+    private List<ItemMasVendidoDto>? items;
+
+    private async Task GenerarReporte()
+    {
+        try
+        {
+            items = await ReporteService.ReporteItemsMasVendidos(inicio, fin);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al generar reporte: {ex.Message}");
+            items = new List<ItemMasVendidoDto>();
+        }
+    }
+
+    private void Volver()
+    {
+        Nav.NavigateTo("/admin/reportes");
+    }
+}

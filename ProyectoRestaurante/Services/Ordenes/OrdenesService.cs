@@ -17,8 +17,8 @@ namespace ProyectoRestaurante.Services.Ordenes
             using var db = await factory.CreateDbContextAsync();
 
             var subtotal = dto.Items.Sum(i => i.PrecioUnitario * i.Cantidad);
-            var iva = (int)Math.Round(subtotal * dto.TasaImpuesto, MidpointRounding.AwayFromZero);
-            var total = subtotal + iva;
+            var impuesto = (int)Math.Round(subtotal * dto.TasaImpuesto, MidpointRounding.AwayFromZero);
+            var total = subtotal;
 
             var orden = new Orden
             {
@@ -29,7 +29,7 @@ namespace ProyectoRestaurante.Services.Ordenes
                 Fecha = DateTime.UtcNow,
                 Estado = EstadoOrden.Recibida,
                 Subtotal = subtotal,
-                Impuestos = iva,
+                Impuestos = impuesto,
                 Total = total,
                 NotasInternas = null
             };

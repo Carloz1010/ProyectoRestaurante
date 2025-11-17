@@ -3,6 +3,7 @@
     public enum MetodoPago
     {
         Local = 1,
-        Pasarela = 2
+        Pasarela = 2,
+        Tarjeta = 3
     }
 }

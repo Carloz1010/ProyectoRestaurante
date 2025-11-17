@@ -36,9 +36,9 @@ else
     </table>
 
     <div>
-        <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>
-        <p>IVA (19%): <b>@CarritoService.Impuestos(TasaIva).ToString("C")</b></p>
-        <p>Total: <b>@CarritoService.Total(TasaIva).ToString("C")</b></p>
+        @*<p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>*@
+        <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(Impuesto).ToString("C")</b></p>
+        <p>Total: <b>@CarritoService.Total().ToString("C")</b></p>
     </div>
 
     <div>
@@ -48,7 +48,7 @@ else
 }
 
 @code{
-    const decimal TasaIva = 0.19m;
+    const decimal Impuesto = 0.1m;
 
     void Quitar(int id) { CarritoService.Quitar(id); StateHasChanged(); }
 

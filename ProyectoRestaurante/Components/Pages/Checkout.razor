@@ -1,9 +1,12 @@
 ﻿@page "/checkout"
+@using System
+@using System.Linq
 @using System.ComponentModel.DataAnnotations
 @using ProyectoRestaurante.Services.Carrito
 @using ProyectoRestaurante.Services.Catalogo
 @using ProyectoRestaurante.Services.Ordenes
 @using ProyectoRestaurante.Services.DTOs
+@using ProyectoRestaurante.Domain.Enums
 @inject ICatalogoService CatalogoService
 @inject ICarritoService CarritoService
 @inject IOrdenesService OrdenesService
@@ -16,6 +19,7 @@
     <div>
         <h4>¡Orden creada!</h4>
         <p>Número: <b>@confirmacion.OrdenId</b></p>
+        <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
         <p>Fecha: <b>@confirmacion.FechaLocal</b></p>
         <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
     </div>
@@ -35,42 +39,87 @@ else
             <div>
                 <label>Nombre *</label>
                 <InputText @bind-Value="form.Nombre" />
-                <ValidationMessage For="@(()=> form.Nombre)" />
+                <ValidationMessage For="@(() => form.Nombre)" />
             </div>
+
             <div>
                 <label>Teléfono *</label>
                 <InputText @bind-Value="form.Telefono" />
-                <ValidationMessage For="@(()=> form.Telefono)" />
+                <ValidationMessage For="@(() => form.Telefono)" />
             </div>
+
             <div>
                 <label>Email</label>
                 <InputText @bind-Value="form.Email" />
-                <ValidationMessage For="@(()=> form.Email)" />
+                <ValidationMessage For="@(() => form.Email)" />
             </div>
+
             <div>
-                <label>Dirección</label>
-                <InputText @bind-Value="form.Direccion" />
+                <label>Modalidad de pedido *</label>
+                <InputSelect TValue="ModalidadPedido" @bind-Value="form.Modalidad">
+                    @foreach (var m in Enum.GetValues<ModalidadPedido>())
+                    {
+                        <option value="@m">@GetModalidadTexto(m)</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => form.Modalidad)" />
             </div>
+
+            <div>
+                <label>Método de pago *</label>
+                <InputSelect TValue="MetodoPago" @bind-Value="form.MetodoPago">
+                    @foreach (var mp in Enum.GetValues<MetodoPago>())
+                    {
+                        <option value="@mp">@GetMetodoPagoTexto(mp)</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => form.MetodoPago)" />
+            </div>
+
+            @if (form.Modalidad == ModalidadPedido.EnLocal)
+            {
+                <div>
+                    <label>Mesa *</label>
+                    <InputText @bind-Value="form.Mesa" />
+                    <ValidationMessage For="@(() => form.Mesa)" />
+                </div>
+            }
+            else if (form.Modalidad == ModalidadPedido.Domicilio)
+            {
+                <div>
+                    <label>Dirección *</label>
+                    <InputText @bind-Value="form.Direccion" />
+                    <ValidationMessage For="@(() => form.Direccion)" />
+                </div>
+            }
+            else if (form.Modalidad == ModalidadPedido.ParaLlevar && tiempoEstimadoMinutos > 0)
+            {
+                <div>
+                    <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
+                </div>
+            }
         </div>
 
         <div>
-            <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>
-            <p>IVA (19%): <b>@CarritoService.Impuestos(TasaIva).ToString("C")</b></p>
-            <p>Total: <b>@CarritoService.Total(TasaIva).ToString("C")</b></p>
+            @* <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p> *@
+            <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(Impuesto).ToString("C")</b></p>
+            <p>Total: <b>@CarritoService.Total().ToString("C")</b></p>
         </div>
 
         <button type="submit">Confirmar pedido</button>
-        <button type="button" @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al carrito</button>
+        <button type="button" @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
     </EditForm>
 }
 
-@code{
-    const decimal TasaIva = 0.19m;
+@code {
+    const decimal Impuesto = 0.1m;
 
     CheckoutForm form = new();
     ConfirmacionOrden? confirmacion;
 
-    class CheckoutForm
+    int tiempoEstimadoMinutos;
+
+    class CheckoutForm : IValidatableObject
     {
         [Required, MinLength(2)]
         public string Nombre { get; set; } = string.Empty;
@@ -82,6 +131,31 @@ else
         public string? Email { get; set; }
 
         public string? Direccion { get; set; }
+
+        [Required]
+        public ModalidadPedido Modalidad { get; set; } = ModalidadPedido.EnLocal;
+
+        [Required]
+        public MetodoPago MetodoPago { get; set; } = MetodoPago.Local;
+
+        public string? Mesa { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Modalidad == ModalidadPedido.EnLocal && string.IsNullOrWhiteSpace(Mesa))
+            {
+                yield return new ValidationResult(
+                    "La mesa es obligatoria cuando el pedido es en local.",
+                    new[] { nameof(Mesa) });
+            }
+
+            if (Modalidad == ModalidadPedido.Domicilio && string.IsNullOrWhiteSpace(Direccion))
+            {
+                yield return new ValidationResult(
+                    "La dirección es obligatoria cuando el pedido es a domicilio.",
+                    new[] { nameof(Direccion) });
+            }
+        }
     }
 
     class ConfirmacionOrden
@@ -89,6 +163,39 @@ else
         public int OrdenId { get; set; }
         public string FechaLocal { get; set; } = string.Empty;
     }
+
+    protected override void OnInitialized()
+    {
+        CalcularTiempoEstimado();
+    }
+
+    private void CalcularTiempoEstimado()
+    {
+        if (!CarritoService.Items.Any())
+        {
+            tiempoEstimadoMinutos = 0;
+            return;
+        }
+
+        var maxPrep = CarritoService.Items.Max(i => i.TiempoPreparacionMin);
+        tiempoEstimadoMinutos = maxPrep + 15;
+    }
+
+    private static string GetModalidadTexto(ModalidadPedido modalidad) => modalidad switch
+    {
+        ModalidadPedido.EnLocal => "En local",
+        ModalidadPedido.ParaLlevar => "Para llevar",
+        ModalidadPedido.Domicilio => "Domicilio",
+        _ => modalidad.ToString()
+    };
+
+    private static string GetMetodoPagoTexto(MetodoPago metodo) => metodo switch
+    {
+        MetodoPago.Local => "Pago en el local",
+        MetodoPago.Pasarela => "Pasarela de pago",
+        MetodoPago.Tarjeta => "Tarjeta",
+        _ => metodo.ToString()
+    };
 
     private async Task CrearOrden()
     {
@@ -98,7 +205,10 @@ else
             Telefono = form.Telefono,
             Email = form.Email,
             Direccion = form.Direccion,
-            TasaImpuesto = TasaIva,
+            TasaImpuesto = Impuesto,
+            Modalidad = form.Modalidad,
+            MetodoPago = form.MetodoPago,
+            Mesa = form.Mesa,
             Items = CarritoService.Items.Select(i => new CrearOrdenItemDTO
             {
                 ProductoId = i.ProductoId,

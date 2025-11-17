@@ -8,6 +8,7 @@ using ProyectoRestaurante.Services.Carrito;
 using ProyectoRestaurante.Services.Catalogo;
 using ProyectoRestaurante.Services.CatalogoAdmin;
 using ProyectoRestaurante.Services.Ordenes;
+using ProyectoRestaurante.Services.Reporte;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IOrdenesService, OrdenesService>();
 builder.Services.AddScoped<ICarritoService, CarritoService>();
 builder.Services.AddScoped<IAutenticacionService, AutenticacionService>();
 builder.Services.AddScoped<ICatalogoAdminService, CatalogoAdminService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AutenticacionStateProvider>();

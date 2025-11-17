@@ -37,7 +37,8 @@ namespace ProyectoRestaurante.Services.Catalogo
                     ImagenArchivo = p.ImagenArchivo,
                     Activo = p.Activo,
                     CategoriaId = p.CategoriaId,
-                    CategoriaNombre = p.Categoria.Nombre
+                    CategoriaNombre = p.Categoria.Nombre,
+                    TiempoPreparacionMin = p.TiempoPreparacionMin
                 })
                 .ToListAsync();
         }
@@ -56,7 +57,8 @@ namespace ProyectoRestaurante.Services.Catalogo
                     ImagenArchivo = p.ImagenArchivo,
                     Activo = p.Activo,
                     CategoriaId = p.CategoriaId,
-                    CategoriaNombre = p.Categoria.Nombre
+                    CategoriaNombre = p.Categoria.Nombre,
+                    TiempoPreparacionMin = p.TiempoPreparacionMin
                 }).FirstOrDefaultAsync();
         }
     }

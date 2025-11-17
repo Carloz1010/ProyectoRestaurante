@@ -7,5 +7,6 @@
         public int PrecioUnitario { get; set; }
         public int Cantidad { get; set; }
         public int Subtotal => PrecioUnitario * Cantidad;
+        public int TiempoPreparacionMin { get; set; }
     }
 }

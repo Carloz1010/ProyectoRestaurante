@@ -27,8 +27,8 @@ public class CartServiceTests
         // Assert intermedio
         Assert.Equal(2, cart.Items.Count);
         Assert.Equal(31000m, cart.Subtotal());
-        Assert.Equal(5890m, cart.Impuestos(0.19m));
-        Assert.Equal(36890m, cart.Total(0.19m));
+        Assert.Equal(5890m, cart.Impuestos(0.1m));
+        Assert.Equal(36890m, cart.Total());
 
         // Act: actualizar cantidad
         cart.ActualizarCantidad(1, 3); // ahora 3 x 8000 = 24000 + 15000 = 39000
@@ -67,7 +67,7 @@ public class CartServiceTests
 
         // Act 4: carrito vacío, totales deben ser cero
         Assert.Equal(0m, cart.Subtotal());
-        Assert.Equal(0m, cart.Impuestos(0.19m));
-        Assert.Equal(0m, cart.Total(0.19m));
+        Assert.Equal(0m, cart.Impuestos(0.1m));
+        Assert.Equal(0m, cart.Total());
     }
 }

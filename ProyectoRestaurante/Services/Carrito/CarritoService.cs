@@ -12,7 +12,7 @@ namespace ProyectoRestaurante.Services.Carrito
             if (cantidad <= 0) return;
             var i = items.FirstOrDefault(x => x.ProductoId == p.Id);
             if (i is null)
-                items.Add(new CarritoItemDTO { ProductoId = p.Id, Nombre = p.Nombre, PrecioUnitario = p.Precio, Cantidad = cantidad });
+                items.Add(new CarritoItemDTO { ProductoId = p.Id, Nombre = p.Nombre, PrecioUnitario = p.Precio, Cantidad = cantidad, TiempoPreparacionMin = p.TiempoPreparacionMin });
             else
                 i.Cantidad += cantidad;
         }
@@ -29,7 +29,7 @@ namespace ProyectoRestaurante.Services.Carrito
         public void Vaciar() => items.Clear();
 
         public int Subtotal() => items.Sum(x => x.Subtotal);
-        public int Impuestos(decimal tasaIva) => (int)Math.Round(Subtotal() * tasaIva, MidpointRounding.AwayFromZero);
-        public int Total(decimal tasaIva) => Subtotal() + Impuestos(tasaIva);
+        public int Impuestos(decimal impuesto) => (int)Math.Round(Subtotal() * impuesto, MidpointRounding.AwayFromZero);
+        public int Total() => Subtotal();
     }
 }

@@ -1,0 +1,55 @@
+﻿@page "/admin/reportes/ventas"
+@using ProyectoRestaurante.Services.DTOs
+@using ProyectoRestaurante.Services.Reporte
+@inject IReporteService ReporteService
+@inject NavigationManager Nav
+
+<h3>Reporte de ventas</h3>
+
+<div class="row">
+    <div class="col">
+        <label>Fecha inicio:</label>
+        <input type="date" @bind="inicio" @bind:format="yyyy-MM-dd" class="form-control" />
+    </div>
+    <div class="col">
+        <label>Fecha fin:</label>
+        <input type="date" @bind="fin" @bind:format="yyyy-MM-dd" class="form-control" />
+    </div>
+</div>
+
+<button class="btn btn-primary mt-3" @onclick="GenerarReporte">Generar</button>
+<button class="btn btn-secondary mt-3 ms-2" @onclick="Volver">Volver</button>
+
+@if (reporte != null)
+{
+    <div class="card mt-3 p-3">
+        <p><strong>Rango:</strong> @reporte.FechaInicio.ToShortDateString() - @reporte.FechaFin.ToShortDateString()</p>
+        <p><strong>Número de pedidos:</strong> @reporte.NumeroPedidos</p>
+        <p><strong>Total ventas:</strong> @reporte.TotalVentas.ToString("C")</p>
+    </div>
+}
+
+@code {
+    private DateTime inicio = DateTime.Today.AddDays(-7);
+    private DateTime fin = DateTime.Today;
+
+    private ReporteVentasDto? reporte;
+
+    private async Task GenerarReporte()
+    {
+        try
+        {
+            reporte = await ReporteService.ReporteVentas(inicio, fin);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al generar reporte: {ex.Message}");
+            reporte = null;
+        }
+    }
+
+    private void Volver()
+    {
+        Nav.NavigateTo("/admin/reportes");
+    }
+}
