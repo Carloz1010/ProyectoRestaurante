@@ -16,215 +16,219 @@
 @inject IJSRuntime Js
 @inject IWebHostEnvironment Env
 
-<h3>Gestión de catálogo (categorías y productos)</h3>
+<div class="admin-bg">
+    <div class="admin-container">
+        <h3 class="titulo-admin">Gestión de catálogo (categorías y productos)</h3>
 
-@if (!string.IsNullOrEmpty(mensajeOk))
-{
-    <div class="alert alert-success">@mensajeOk</div>
-}
+        @if (!string.IsNullOrEmpty(mensajeOk))
+        {
+            <div class="alert alert-success">@mensajeOk</div>
+        }
 
-@if (!string.IsNullOrEmpty(mensajeError))
-{
-    <div class="alert alert-danger">@mensajeError</div>
-}
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger">@mensajeError</div>
+        }
 
-@if (categorias is null || productos is null)
-{
-    <p>Cargando…</p>
-}
-else
-{
-    <div class="row">
-        <!-- CATEGORÍAS -->
-        <div class="col-md-4">
-            <h5>Categorías</h5>
+        @if (categorias is null || productos is null)
+        {
+            <p>Cargando…</p>
+        }
+        else
+        {
+            <div class="row">
+                <!-- CATEGORÍAS -->
+                <div class="col-md-4 admin-section">
+                    <h5>Categorías</h5>
 
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Activa</th>
-                        <th>Orden</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var c in categorias)
-                    {
-                        <tr>
-                            <td>@c.Nombre</td>
-                            <td>@(c.Activa ? "Sí" : "No")</td>
-                            <td>@c.Orden</td>
-                            <td>
-                                <button class="btn btn-sm btn-secondary me-1"
-                                        @onclick="() => EditarCategoria(c)">
-                                    Editar
-                                </button>
-                                <button class="btn btn-sm btn-danger"
-                                        @onclick="() => EliminarCategoria(c)">
-                                    Eliminar
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    <table class="admin-table table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Activa</th>
+                                <th>Orden</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in categorias)
+                            {
+                                <tr>
+                                    <td>@c.Nombre</td>
+                                    <td>@(c.Activa ? "Sí" : "No")</td>
+                                    <td>@c.Orden</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary me-1"
+                                                @onclick="() => EditarCategoria(c)">
+                                            Editar
+                                        </button>
+                                        <button class="btn btn-sm btn-danger"
+                                                @onclick="() => EliminarCategoria(c)">
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
 
-            <h6>@(editandoCategoria ? "Editar categoría" : "Nueva categoría")</h6>
+                    <h6>@(editandoCategoria ? "Editar categoría" : "Nueva categoría")</h6>
 
-            <EditForm Model="categoriaForm" OnValidSubmit="GuardarCategoria">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+                    <EditForm Model="categoriaForm" OnValidSubmit="GuardarCategoria" class="admin-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
 
-                <div class="mb-2">
-                    <label>Nombre</label>
-                    <InputText class="form-control" @bind-Value="categoriaForm.Nombre" />
-                    <ValidationMessage For="@(() => categoriaForm.Nombre)" />
-                </div>
+                        <div class="mb-2">
+                            <label>Nombre</label>
+                            <InputText class="form-control" @bind-Value="categoriaForm.Nombre" />
+                            <ValidationMessage For="@(() => categoriaForm.Nombre)" />
+                        </div>
 
-                <div class="mb-2">
-                    <label>Orden (opcional)</label>
-                    <InputNumber class="form-control" @bind-Value="categoriaForm.Orden" />
-                </div>
+                        <div class="mb-2">
+                            <label>Orden (opcional)</label>
+                            <InputNumber class="form-control" @bind-Value="categoriaForm.Orden" />
+                        </div>
 
-                <div class="form-check mb-2">
-                    <InputCheckbox class="form-check-input" @bind-Value="categoriaForm.Activa" />
-                    <label class="form-check-label">Activa</label>
-                </div>
+                        <div class="form-check mb-2">
+                            <InputCheckbox class="form-check-input" @bind-Value="categoriaForm.Activa" />
+                            <label class="form-check-label">Activa</label>
+                        </div>
 
-                <button class="btn btn-primary" type="submit">
-                    @(editandoCategoria ? "Guardar cambios" : "Crear categoría")
-                </button>
+                        <button class="btn btn-primary" type="submit">
+                            @(editandoCategoria ? "Guardar cambios" : "Crear categoría")
+                        </button>
 
-                @if (editandoCategoria)
-                {
-                    <button class="btn btn-link" type="button" @onclick="CancelarEditarCategoria">
-                        Cancelar
-                    </button>
-                }
-            </EditForm>
-        </div>
-
-        <!-- PRODUCTOS -->
-        <div class="col-md-8">
-            <h5>Productos</h5>
-
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Prep. (min)</th>
-                        <th>Activo</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var p in productos)
-                    {
-                        <tr>
-                            <td>@p.Nombre</td>
-                            <td>@p.CategoriaNombre</td>
-                            <td>@p.Precio.ToString("C")</td>
-                            <td>@p.TiempoPreparacionMin</td>
-                            <td>@(p.Activo ? "Sí" : "No")</td>
-                            <td>
-                                <button class="btn btn-sm btn-secondary me-1"
-                                        @onclick="() => EditarProducto(p)">
-                                    Editar
-                                </button>
-                                <button class="btn btn-sm btn-warning me-1"
-                                        @onclick="() => CambiarEstadoProducto(p)">
-                                    @(p.Activo ? "Inactivar" : "Activar")
-                                </button>
-                                <button class="btn btn-sm btn-danger"
-                                        @onclick="() => EliminarProducto(p)">
-                                    Eliminar
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <h6>@(editandoProducto ? "Editar producto" : "Nuevo producto")</h6>
-
-            <EditForm Model="productoForm" OnValidSubmit="GuardarProducto">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-
-                <div class="mb-2">
-                    <label>Nombre</label>
-                    <InputText class="form-control" @bind-Value="productoForm.Nombre" />
-                    <ValidationMessage For="@(() => productoForm.Nombre)" />
-                </div>
-
-                <div class="mb-2">
-                    <label>Descripción</label>
-                    <InputTextArea class="form-control" @bind-Value="productoForm.Descripcion" />
-                </div>
-
-                <div class="mb-2">
-                    <label>Precio (COP)</label>
-                    <InputNumber class="form-control" @bind-Value="productoForm.Precio" />
-                    <ValidationMessage For="@(() => productoForm.Precio)" />
-                </div>
-
-                <div class="mb-2">
-                    <label>Tiempo preparación (min)</label>
-                    <InputNumber class="form-control" @bind-Value="productoForm.TiempoPreparacionMin" />
-                    <ValidationMessage For="@(() => productoForm.TiempoPreparacionMin)" />
-                </div>
-
-                <div class="mb-2">
-                    <label>Subir imagen (archivo)</label>
-                    <InputFile OnChange="OnImagenSeleccionada" />
-                    <small class="form-text text-muted">
-                        Se guardará en la carpeta <code>wwwroot/img</code>.
-                    </small>
-                </div>
-
-                <div class="mb-2">
-                    <label>O pegar nombre / URL de imagen (opcional)</label>
-                    <InputText class="form-control" @bind-Value="productoForm.ImagenArchivo" />
-                    <small class="form-text text-muted">
-                        Si no subes archivo, se usará este valor.
-                        Si subes archivo, se ignorará esto y se usará el archivo.
-                    </small>
-                </div>
-
-                <div class="mb-2">
-                    <label>Categoría</label>
-                    <InputSelect class="form-select" @bind-Value="productoForm.CategoriaId">
-                        <option value="0">-- Seleccione categoría --</option>
-                        @foreach (var c in categorias)
+                        @if (editandoCategoria)
                         {
-                            <option value="@c.Id">@c.Nombre</option>
+                            <button class="btn btn-link" type="button" @onclick="CancelarEditarCategoria">
+                                Cancelar
+                            </button>
                         }
-                    </InputSelect>
-                    <ValidationMessage For="@(() => productoForm.CategoriaId)" />
+                    </EditForm>
                 </div>
 
-                <div class="form-check mb-2">
-                    <InputCheckbox class="form-check-input" @bind-Value="productoForm.Activo" />
-                    <label class="form-check-label">Activo</label>
+                <!-- PRODUCTOS -->
+                <div class="col-md-8 admin-section">
+                    <h5>Productos</h5>
+
+                    <table class="admin-table table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Prep. (min)</th>
+                                <th>Activo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in productos)
+                            {
+                                <tr>
+                                    <td>@p.Nombre</td>
+                                    <td>@p.CategoriaNombre</td>
+                                    <td>@p.Precio.ToString("C")</td>
+                                    <td>@p.TiempoPreparacionMin</td>
+                                    <td>@(p.Activo ? "Sí" : "No")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary me-1"
+                                                @onclick="() => EditarProducto(p)">
+                                            Editar
+                                        </button>
+                                        <button class="btn btn-sm btn-warning me-1"
+                                                @onclick="() => CambiarEstadoProducto(p)">
+                                            @(p.Activo ? "Inactivar" : "Activar")
+                                        </button>
+                                        <button class="btn btn-sm btn-danger"
+                                                @onclick="() => EliminarProducto(p)">
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <h6>@(editandoProducto ? "Editar producto" : "Nuevo producto")</h6>
+
+                    <EditForm Model="productoForm" OnValidSubmit="GuardarProducto" class="admin-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-2">
+                            <label>Nombre</label>
+                            <InputText class="form-control" @bind-Value="productoForm.Nombre" />
+                            <ValidationMessage For="@(() => productoForm.Nombre)" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Descripción</label>
+                            <InputTextArea class="form-control" @bind-Value="productoForm.Descripcion" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Precio (COP)</label>
+                            <InputNumber class="form-control" @bind-Value="productoForm.Precio" />
+                            <ValidationMessage For="@(() => productoForm.Precio)" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Tiempo preparación (min)</label>
+                            <InputNumber class="form-control" @bind-Value="productoForm.TiempoPreparacionMin" />
+                            <ValidationMessage For="@(() => productoForm.TiempoPreparacionMin)" />
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Subir imagen (archivo)</label>
+                            <InputFile OnChange="OnImagenSeleccionada" />
+                            <small class="form-text text-muted">
+                                Se guardará en la carpeta <code>wwwroot/img</code>.
+                            </small>
+                        </div>
+
+                        <div class="mb-2">
+                            <label>O pegar nombre / URL de imagen (opcional)</label>
+                            <InputText class="form-control" @bind-Value="productoForm.ImagenArchivo" />
+                            <small class="form-text text-muted">
+                                Si no subes archivo, se usará este valor.
+                                Si subes archivo, se ignorará esto y se usará el archivo.
+                            </small>
+                        </div>
+
+                        <div class="mb-2">
+                            <label>Categoría</label>
+                            <InputSelect class="form-select" @bind-Value="productoForm.CategoriaId">
+                                <option value="0">-- Seleccione categoría --</option>
+                                @foreach (var c in categorias)
+                                {
+                                    <option value="@c.Id">@c.Nombre</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => productoForm.CategoriaId)" />
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <InputCheckbox class="form-check-input" @bind-Value="productoForm.Activo" />
+                            <label class="form-check-label">Activo</label>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">
+                            @(editandoProducto ? "Guardar cambios" : "Crear producto")
+                        </button>
+
+                        @if (editandoProducto)
+                        {
+                            <button class="btn btn-link" type="button" @onclick="CancelarEditarProducto">
+                                Cancelar
+                            </button>
+                        }
+                    </EditForm>
                 </div>
-
-                <button class="btn btn-primary" type="submit">
-                    @(editandoProducto ? "Guardar cambios" : "Crear producto")
-                </button>
-
-                @if (editandoProducto)
-                {
-                    <button class="btn btn-link" type="button" @onclick="CancelarEditarProducto">
-                        Cancelar
-                    </button>
-                }
-            </EditForm>
-        </div>
+            </div>
+        }
     </div>
-}
+</div>
 
 @code {
     private IBrowserFile? imagenFile;

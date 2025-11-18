@@ -3,61 +3,86 @@
 @inject ICarritoService CarritoService
 @inject NavigationManager Nav
 
-<h3>Carrito</h3>
+<div class="fondo-carrito">
+    <h3 class="titulo-seccion">Carrito</h3>
 
-@if (!CarritoService.Items.Any())
-{
-    <p>Tu carrito está vacío.</p>
-    <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
-}
-else
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var i in CarritoService.Items)
-        {
-            <tr>
-                <td>@i.Nombre</td>
-                <td>@i.PrecioUnitario.ToString("C")</td>
-                <td>
-                    <input type="number" min="1" value="@i.Cantidad"
-                           @onchange="(e)=> CambiarCantidad(i.ProductoId, e)" />
-                </td>
-                <td>@i.Subtotal.ToString("C")</td>
-                <td><button @onclick="() => Quitar(i.ProductoId)">Quitar</button></td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    @if (!CarritoService.Items.Any())
+    {
+        <p>Tu carrito está vacío.</p>
+        <div class="botones-carrito">
+            <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
+        </div>
+    }
+    else
+    {
+        <div class="carrito-container">
+            <h3>Resumen del Pedido</h3>
 
-    <div>
-        @*<p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>*@
-        <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(Impuesto).ToString("C")</b></p>
-        <p>Total: <b>@CarritoService.Total().ToString("C")</b></p>
-    </div>
+            <table class="tabla-productos">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cant.</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in CarritoService.Items)
+                    {
+                        <tr>
+                            <td>@i.Nombre</td>
+                            <td>@i.PrecioUnitario.ToString("C")</td>
+                            <td>
+                                <input type="number" min="1" value="@i.Cantidad"
+                                       @onchange="(e) => CambiarCantidad(i.ProductoId, e)" />
+                            </td>
+                            <td>@i.Subtotal.ToString("C")</td>
+                            <td>
+                                <button @onclick="() => Quitar(i.ProductoId)">Quitar</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-    <div>
-        <button @onclick="@(() => Nav.NavigateTo("/checkout"))">Continuar al Checkout</button>
-        <button @onclick="Vaciar">Vaciar</button>
-    </div>
-}
+            <div class="resumen-totales">
+                @*<p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p>*@
+                <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(TasaImpuesto).ToString("C")</b></p>
+                <p style="font-size: 1.5rem; font-weight: bold;">
+                    Total: <b>@CarritoService.Total().ToString("C")</b>
+                </p>
+            </div>
 
-@code{
-    const decimal Impuesto = 0.1m;
+            <div class="botones-carrito">
+                <button @onclick="@(() => Nav.NavigateTo("/checkout"))">Continuar al Checkout</button>
+                <button @onclick="Vaciar">Vaciar</button>
+            </div>
+        </div>
+    }
+</div>
 
-    void Quitar(int id) { CarritoService.Quitar(id); StateHasChanged(); }
+@code {
+    const decimal TasaImpuesto = 0.10m;
 
-    void Vaciar() { CarritoService.Vaciar(); StateHasChanged(); }
+    void Quitar(int id)
+    {
+        CarritoService.Quitar(id);
+        StateHasChanged();
+    }
+
+    void Vaciar()
+    {
+        CarritoService.Vaciar();
+        StateHasChanged();
+    }
 
     void CambiarCantidad(int id, ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out var cant))
             CarritoService.ActualizarCantidad(id, cant);
+
         StateHasChanged();
     }
 }

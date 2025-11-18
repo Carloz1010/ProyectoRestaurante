@@ -3,31 +3,36 @@
 @using ProyectoRestaurante.Services.Reporte
 @inject IReporteService ReporteService
 @inject NavigationManager Nav
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
 
-<h3>Reporte de pedidos por día</h3>
-
-<div class="mb-3">
-    <label>Fecha:</label>
-    <input type="date" @bind="fecha" @bind:format="yyyy-MM-dd" class="form-control" />
+<div class="reporte-pedidos-bg">
+    <div class="reporte-pedidos-container">
+        <h3 class="titulo-reporte-pedidos">Reporte de pedidos por día</h3>
+        <div class="reporte-pedidos-form mb-3">
+            <label>Fecha:</label>
+            <input type="date" @bind="fecha" @bind:format="yyyy-MM-dd" class="form-control" />
+        </div>
+        <div class="reporte-pedidos-btns">
+            <button class="btn btn-primary" @onclick="GenerarReporte">Generar</button>
+            <button class="btn btn-secondary" @onclick="Volver">Volver</button>
+        </div>
+        @if (reporte != null)
+        {
+            <div class="reporte-pedidos-card">
+                <p><strong>Fecha:</strong> @reporte.Fecha.ToShortDateString()</p>
+                <p><strong>Total pedidos:</strong> @reporte.TotalPedidos</p>
+                <p><strong>Total venta:</strong> @reporte.TotalVenta.ToString("C")</p>
+            </div>
+        }
+        else if (reporte == null && reporteGenerado)
+        {
+            <div class="reporte-pedidos-alert">
+                No se encontraron pedidos para la fecha seleccionada.
+            </div>
+        }
+    </div>
 </div>
-
-<button class="btn btn-primary" @onclick="GenerarReporte">Generar</button>
-<button class="btn btn-secondary ms-2" @onclick="Volver">Volver</button>
-
-@if (reporte != null)
-{
-    <div class="card mt-3 p-3">
-        <p><strong>Fecha:</strong> @reporte.Fecha.ToShortDateString()</p>
-        <p><strong>Total pedidos:</strong> @reporte.TotalPedidos</p>
-        <p><strong>Total venta:</strong> @reporte.TotalVenta.ToString("C")</p>
-    </div>
-}
-else if (reporte == null && reporteGenerado)
-{
-    <div class="alert alert-info mt-3">
-        No se encontraron pedidos para la fecha seleccionada.
-    </div>
-}
 
 @code {
     private DateTime fecha = DateTime.Today;

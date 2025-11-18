@@ -6,26 +6,51 @@
 @inject AutenticacionStateProvider AuthProvider
 @inject NavigationManager Nav
 
-<h3>Login Administrador</h3>
-@if (!string.IsNullOrEmpty(error))
-{
-    <p class="text-danger">@error</p>
-}
+<div class="login-container">
+    <div class="login-card">
 
-<EditForm Model="model" OnValidSubmit="OnLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+        <h2>Login Administrador</h2>
 
-    <div class="mb-3">
-        <label>Usuario</label>
-        <InputText class="form-control" @bind-Value="model.UserName" />
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="error-msg">@error</div>
+        }
+
+        <EditForm Model="model" OnValidSubmit="OnLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <!-- Usuario -->
+            <div class="form-group">
+                <label>Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                    <InputText class="form-control" @bind-Value="model.UserName" />
+                </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-lock-fill"></i>
+                    </span>
+                    <InputText type="password" class="form-control" @bind-Value="model.Contraseña" />
+                </div>
+            </div>
+
+            <button class="btn-login" type="submit">Ingresar</button>
+        </EditForm>
+
+        <div class="login-footer">
+            <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
     </div>
-    <div class="mb-3">
-        <label>Contraseña</label>
-        <InputText type="password" class="form-control" @bind-Value="model.Contraseña" />
-    </div>
-    <button class="btn btn-primary" type="submit">Ingresar</button>
-</EditForm>
+</div>
 
 @code {
     private LoginModel model = new();

@@ -1,1 +1,91 @@
-﻿
+﻿body {
+}
+
+
+.fondo-catalogo {
+    background-image: url("/img/Fondo.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+}
+
+
+/* --- 1. Estilos para la Cuadrícula del Catálogo --- */
+
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* --- 2. Estilos para la Tarjeta Individual de Producto --- */
+
+.producto-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+    .producto-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* --- 3. Mejoras de Tipografía --- */
+
+    .producto-card h4 {
+        font-family: 'Arial', sans-serif;
+        color: #A01D2A;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 1.5rem;
+    }
+
+    .producto-card p {
+        color: #555;
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+
+    .producto-card b {
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: block;
+    }
+
+    .producto-card button {
+        background-color: #FFC300;
+        color: black;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 15px;
+        margin: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s;
+    }
+
+        .producto-card button:hover {
+            background-color: #e6b200;
+        }
+
+/* Para los h3 */
+.titulo-seccion {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #A01D2A;
+    font-size: 2.2rem;
+    font-weight: 800;
+    border-bottom: 3px solid #FFC300;
+    width: 50%;
+    margin: 25px auto 30px auto;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}

@@ -6,44 +6,49 @@
 @inject ICarritoService CarritoService
 @inject NavigationManager Nav
 
-<h3>Detalle del producto</h3>
+<div class="fondo-ProductoDetalle">
+    <h3 class="titulo-seccion">Detalle del producto</h3>
 
-@if (producto is null)
-{
-    <p>Cargando…</p>
-}
-else
-{
-    <div>
-        @if (!string.IsNullOrEmpty(producto.ImagenArchivo))
-        {
-            <img src="@($"/img/{producto.ImagenArchivo}")"
-                 alt="Imagen de @producto.Nombre"
-                 style="max-width: 200px; max-height: 200px; object-fit: cover;" />
-        }
-        else
-        {
-            <img src="img/placeholder.png"
-                 alt="Sin imagen"
-                 style="max-width: 200px; max-height: 200px; object-fit: cover;" />
-        }
-        <h4>@producto.Nombre</h4>
-        <p>@producto.Descripcion</p>
-        <p><b>@producto.Precio.ToString("C")</b></p>
+    @if (producto is null)
+    {
+        <p>Cargando…</p>
+    }
+    else
+    {
+        <div class="detalle-producto-container">
 
-        <div>
-            <label>Cantidad: </label>
-            <input type="number" min="1" @bind="cantidad" />
+            <div class="imagen-producto">
+                @if (!string.IsNullOrEmpty(producto.ImagenArchivo))
+                {
+                    <img src="@($"/img/{producto.ImagenArchivo}")"
+                         alt="Imagen de @producto.Nombre" />
+                }
+                else
+                {
+                    <img src="img/placeholder.png" alt="Sin imagen" />
+                }
+            </div>
+
+            <div class="info-producto">
+                <h4>@producto.Nombre</h4>
+                <p>@producto.Descripcion</p>
+                <p><b>@producto.Precio.ToString("C")</b></p>
+
+                <div class="cantidad-control">
+                    <label for="cantidad-input">Cantidad: </label>
+                    <input id="cantidad-input" type="number" min="1" @bind="cantidad" />
+                </div>
+
+                <div class="botones-accion">
+                    <button @onclick="Agregar">Agregar al carrito</button>
+                    <button @onclick="@(() => Nav.NavigateTo("/carrito"))">Ver carrito</button>
+                </div>
+            </div>
         </div>
+    }
+</div>
 
-        <div>
-            <button @onclick="Agregar">Agregar al carrito</button>
-            <button @onclick="@(() => Nav.NavigateTo("/carrito"))">Ver carrito</button>
-        </div>
-    </div>
-}
-
-@code{
+@code {
     [Parameter] public int id { get; set; }
     ProductoDTO? producto;
     int cantidad = 1;
@@ -57,4 +62,3 @@ else
         CarritoService.Agregar(producto, cantidad);
     }
 }
-

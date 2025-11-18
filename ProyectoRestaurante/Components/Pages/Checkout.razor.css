@@ -1,0 +1,117 @@
+﻿body {
+}
+
+
+.fondo-Checkout {
+    background-image: url("/img/Fondo.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+}
+
+/* --- 1. Contenedor Principal del Checkout --- */
+.checkout-container {
+    max-width: 950px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* --- 2. Estilos para la Columna de Formulario (Datos del Cliente) --- */
+.form-columna {
+    flex: 1.5;
+    padding-right: 20px;
+}
+
+    .form-columna div {
+        margin-bottom: 15px;
+    }
+
+    .form-columna label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .form-columna input[type="text"],
+    .form-columna input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+/* --- 3. Estilos para la Columna de Resumen (Totales) --- */
+.resumen-columna {
+    flex: 1;
+    padding: 20px;
+    background-color: #FFFDE7;
+    border: 1px solid #FFC300;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+    .resumen-columna p {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        margin: 8px 0;
+    }
+
+        .resumen-columna p:last-child {
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-top: 1px dashed #FFC300;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+/* --- 4. Estilos de Botones de Acción --- */
+.checkout-botones {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+    .checkout-botones button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+
+        .checkout-botones button[type="submit"] {
+            background-color: #A01D2A;
+            color: white;
+        }
+
+        .checkout-botones button[type="button"] {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+/* Para los h3 */
+.titulo-seccion {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #A01D2A;
+    font-size: 2.2rem;
+    font-weight: 800;
+    border-bottom: 3px solid #FFC300;
+    width: 50%;
+    margin: 25px auto 30px auto;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}

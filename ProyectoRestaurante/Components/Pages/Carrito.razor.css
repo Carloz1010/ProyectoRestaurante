@@ -1,0 +1,114 @@
+﻿body {
+}
+
+.fondo-carrito {
+    background-image: url("/img/Fondo.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+}
+
+/* --- 1. Contenedor principal del carrito (Tarjeta) --- */
+.carrito-container {
+    max-width: 950px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 2. Estilo de la tabla de productos --- */
+.tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+    .tabla-productos thead tr {
+        background-color: #A01D2A;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .tabla-productos th,
+    .tabla-productos td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .tabla-productos tbody tr:hover {
+        background-color: #fff8e1;
+    }
+
+    .tabla-productos input[type="number"] {
+        width: 60px;
+        padding: 5px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+/* --- 3. Estilo del Resumen de Totales (Marco) --- */
+.resumen-totales {
+    padding: 20px;
+    border: 1px solid #FFC300;
+    border-radius: 8px;
+    background-color: #FFFDE7;
+    margin-bottom: 25px;
+    width: 300px;
+    margin-left: auto;
+}
+
+    .resumen-totales p {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        margin: 5px 0;
+    }
+
+        .resumen-totales p b {
+            font-weight: 700;
+        }
+
+/* --- 4. Estilo de Botones de Acción --- */
+.botones-carrito {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+    .botones-carrito button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .botones-carrito button:first-child {
+            background-color: #FFC300;
+            color: #000;
+        }
+
+        .botones-carrito button:last-child {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+/* Para los h3 */
+.titulo-seccion {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #A01D2A;
+    font-size: 2.2rem;
+    font-weight: 800;
+    border-bottom: 3px solid #FFC300;
+    width: 50%;
+    margin: 25px auto 30px auto;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}

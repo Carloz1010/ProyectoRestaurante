@@ -12,111 +12,119 @@
 @inject IOrdenesService OrdenesService
 @inject NavigationManager Nav
 
-<h3>Checkout</h3>
+<div class="fondo-Checkout">
+    <h3 class="titulo-seccion">Checkout</h3>
 
-@if (confirmacion is not null)
-{
-    <div>
-        <h4>¡Orden creada!</h4>
-        <p>Número: <b>@confirmacion.OrdenId</b></p>
-        <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
-        <p>Fecha: <b>@confirmacion.FechaLocal</b></p>
-        <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
-    </div>
-}
-else if (!CarritoService.Items.Any())
-{
-    <p>No tienes items en el carrito.</p>
-    <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Ir al catálogo</button>
-}
-else
-{
-    <EditForm Model="@form" OnValidSubmit="@CrearOrden">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
+    @if (confirmacion is not null)
+    {
         <div>
-            <div>
-                <label>Nombre *</label>
-                <InputText @bind-Value="form.Nombre" />
-                <ValidationMessage For="@(() => form.Nombre)" />
-            </div>
-
-            <div>
-                <label>Teléfono *</label>
-                <InputText @bind-Value="form.Telefono" />
-                <ValidationMessage For="@(() => form.Telefono)" />
-            </div>
-
-            <div>
-                <label>Email</label>
-                <InputText @bind-Value="form.Email" />
-                <ValidationMessage For="@(() => form.Email)" />
-            </div>
-
-            <div>
-                <label>Modalidad de pedido *</label>
-                <InputSelect TValue="ModalidadPedido" @bind-Value="form.Modalidad">
-                    @foreach (var m in Enum.GetValues<ModalidadPedido>())
-                    {
-                        <option value="@m">@GetModalidadTexto(m)</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="@(() => form.Modalidad)" />
-            </div>
-
-            <div>
-                <label>Método de pago *</label>
-                <InputSelect TValue="MetodoPago" @bind-Value="form.MetodoPago">
-                    @foreach (var mp in Enum.GetValues<MetodoPago>())
-                    {
-                        <option value="@mp">@GetMetodoPagoTexto(mp)</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="@(() => form.MetodoPago)" />
-            </div>
-
-            @if (form.Modalidad == ModalidadPedido.EnLocal)
-            {
-                <div>
-                    <label>Mesa *</label>
-                    <InputText @bind-Value="form.Mesa" />
-                    <ValidationMessage For="@(() => form.Mesa)" />
-                </div>
-            }
-            else if (form.Modalidad == ModalidadPedido.Domicilio)
-            {
-                <div>
-                    <label>Dirección *</label>
-                    <InputText @bind-Value="form.Direccion" />
-                    <ValidationMessage For="@(() => form.Direccion)" />
-                </div>
-            }
-            else if (form.Modalidad == ModalidadPedido.ParaLlevar && tiempoEstimadoMinutos > 0)
-            {
-                <div>
-                    <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
-                </div>
-            }
+            <h4>¡Orden creada!</h4>
+            <p>Número: <b>@confirmacion.OrdenId</b></p>
+            <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
+            <p>Fecha: <b>@confirmacion.FechaLocal</b></p>
+            <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
         </div>
+    }
+    else if (!CarritoService.Items.Any())
+    {
+        <p>No tienes items en el carrito.</p>
+        <button @onclick="@(() => Nav.NavigateTo("/catalogo"))">Ir al catálogo</button>
+    }
+    else
+    {
+        <div class="checkout-container">
+            <EditForm Model="@form" OnValidSubmit="@CrearOrden" class="form-columna">
+                <h4>1. Datos y detalles del pedido</h4>
 
-        <div>
-            @* <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p> *@
-            <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(Impuesto).ToString("C")</b></p>
-            <p>Total: <b>@CarritoService.Total().ToString("C")</b></p>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div>
+                    <div>
+                        <label>Nombre *</label>
+                        <InputText @bind-Value="form.Nombre" />
+                        <ValidationMessage For="@(() => form.Nombre)" />
+                    </div>
+
+                    <div>
+                        <label>Teléfono *</label>
+                        <InputText @bind-Value="form.Telefono" />
+                        <ValidationMessage For="@(() => form.Telefono)" />
+                    </div>
+
+                    <div>
+                        <label>Email</label>
+                        <InputText @bind-Value="form.Email" />
+                        <ValidationMessage For="@(() => form.Email)" />
+                    </div>
+
+                    <div>
+                        <label>Modalidad de pedido *</label>
+                        <InputSelect TValue="ModalidadPedido" @bind-Value="form.Modalidad">
+                            @foreach (var m in Enum.GetValues<ModalidadPedido>())
+                            {
+                                <option value="@m">@GetModalidadTexto(m)</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => form.Modalidad)" />
+                    </div>
+
+                    <div>
+                        <label>Método de pago *</label>
+                        <InputSelect TValue="MetodoPago" @bind-Value="form.MetodoPago">
+                            @foreach (var mp in Enum.GetValues<MetodoPago>())
+                            {
+                                <option value="@mp">@GetMetodoPagoTexto(mp)</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => form.MetodoPago)" />
+                    </div>
+
+                    @if (form.Modalidad == ModalidadPedido.EnLocal)
+                    {
+                        <div>
+                            <label>Mesa *</label>
+                            <InputText @bind-Value="form.Mesa" />
+                            <ValidationMessage For="@(() => form.Mesa)" />
+                        </div>
+                    }
+                    else if (form.Modalidad == ModalidadPedido.Domicilio)
+                    {
+                        <div>
+                            <label>Dirección *</label>
+                            <InputText @bind-Value="form.Direccion" />
+                            <ValidationMessage For="@(() => form.Direccion)" />
+                        </div>
+                    }
+                    else if (form.Modalidad == ModalidadPedido.ParaLlevar && tiempoEstimadoMinutos > 0)
+                    {
+                        <div>
+                            <p>Tiempo estimado de espera: <b>@tiempoEstimadoMinutos</b> minutos.</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="checkout-botones">
+                    <button type="submit">Confirmar pedido</button>
+                    <button type="button" @onclick="@(() => Nav.NavigateTo("/carrito"))">Volver al carrito</button>
+                </div>
+            </EditForm>
+
+            <div class="resumen-columna">
+                <h4>2. Resumen de la Orden</h4>
+                @* <p>Subtotal: <b>@CarritoService.Subtotal().ToString("C")</b></p> *@
+                <p>Impuesto al consumo (10%): <b>@CarritoService.Impuestos(Impuesto).ToString("C")</b></p>
+                <p>Total: <b>@CarritoService.Total().ToString("C")</b></p>
+            </div>
         </div>
-
-        <button type="submit">Confirmar pedido</button>
-        <button type="button" @onclick="@(() => Nav.NavigateTo("/catalogo"))">Volver al catálogo</button>
-    </EditForm>
-}
+    }
+</div>
 
 @code {
     const decimal Impuesto = 0.1m;
 
     CheckoutForm form = new();
     ConfirmacionOrden? confirmacion;
-
     int tiempoEstimadoMinutos;
 
     class CheckoutForm : IValidatableObject

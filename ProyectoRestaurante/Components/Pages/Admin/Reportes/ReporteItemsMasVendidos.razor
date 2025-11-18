@@ -3,50 +3,54 @@
 @using ProyectoRestaurante.Services.Reporte
 @inject IReporteService ReporteService
 @inject NavigationManager Nav
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
 
-
-<h3>Ítems más vendidos</h3>
-
-<div class="row">
-    <div class="col">
-        <label>Inicio:</label>
-        <input type="date" @bind="inicio" @bind:format="yyyy-MM-dd" class="form-control" />
-    </div>
-    <div class="col">
-        <label>Fin:</label>
-        <input type="date" @bind="fin" @bind:format="yyyy-MM-dd" class="form-control" />
+<div class="items-mas-vendidos-bg">
+    <div class="items-mas-vendidos-container">
+        <h3 class="titulo-items-mas-vendidos">Ítems más vendidos</h3>
+        <div class="items-mas-vendidos-form row">
+            <div class="col">
+                <label>Inicio:</label>
+                <input type="date" @bind="inicio" @bind:format="yyyy-MM-dd" class="form-control" />
+            </div>
+            <div class="col">
+                <label>Fin:</label>
+                <input type="date" @bind="fin" @bind:format="yyyy-MM-dd" class="form-control" />
+            </div>
+        </div>
+        <div class="items-mas-vendidos-btns">
+            <button class="btn btn-primary" @onclick="GenerarReporte">Generar</button>
+            <button class="btn btn-secondary" @onclick="Volver">Volver</button>
+        </div>
+        @if (items != null && items.Count > 0)
+        {
+            <table class="items-mas-vendidos-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad Vendida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.ProductoNombre</td>
+                            <td>@item.CantidadVendida</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else if (items != null && items.Count == 0)
+        {
+            <div class="items-mas-vendidos-alert">
+                No se encontraron ítems vendidos en el rango de fechas seleccionado.
+            </div>
+        }
     </div>
 </div>
-
-<button class="btn btn-primary mt-3" @onclick="GenerarReporte">Generar</button>
-<button class="btn btn-secondary mt-3 ms-2" @onclick="Volver">Volver</button>
-
-@if (items != null && items.Count > 0)
-{
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad Vendida</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in items)
-            {
-                <tr>
-                    <td>@item.ProductoNombre</td>
-                    <td>@item.CantidadVendida</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (items != null && items.Count == 0)
-{
-    <div class="alert alert-info mt-3">
-        No se encontraron ítems vendidos en el rango de fechas seleccionado.
-    </div>
-}
 
 @code {
     private DateTime inicio = DateTime.Today.AddDays(-30);

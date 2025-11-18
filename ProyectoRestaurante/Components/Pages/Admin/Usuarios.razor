@@ -7,69 +7,69 @@
 @inject IAutenticacionService AutenticacionService
 @inject IJSRuntime Js
 
-<h3>Usuarios Administradores</h3>
-
-@if (usuarios is null)
-{
-    <p>Cargando…</p>
-}
-else
-{
-    <ul>
-        @foreach (var u in usuarios)
+<div class="usuarios-bg">
+    <div class="usuarios-container">
+        <h3 class="titulo-usuarios">Usuarios Administradores</h3>
+        @if (usuarios is null)
         {
-            <li>
-                @u.UserName
-                @if (!u.Activo)
-                {
-                    <span class="text-muted">(inactivo)</span>
-                }
-
-                <button class="btn btn-danger btn-sm ms-2"
-                        @onclick="() => Eliminar(u)">
-                    Eliminar
-                </button>
-            </li>
+            <p>Cargando…</p>
         }
-    </ul>
-}
+        else
+        {
+            <ul class="usuarios-lista">
+                @foreach (var u in usuarios)
+                {
+                    <li>
+                        <span>
+                            @u.UserName
+                            @if (!u.Activo)
+                            {
+                                <span class="text-muted">(inactivo)</span>
+                            }
+                        </span>
+                        <button @onclick="() => Eliminar(u)">Eliminar</button>
+                    </li>
+                }
+            </ul>
+        }
 
-@if (!string.IsNullOrEmpty(mensajeEliminar))
-{
-    <div class="alert alert-success">@mensajeEliminar</div>
-}
+        @if (!string.IsNullOrEmpty(mensajeEliminar))
+        {
+            <div class="alert alert-success">@mensajeEliminar</div>
+        }
 
-@if (!string.IsNullOrEmpty(mensajeEliminarError))
-{
-    <div class="alert alert-danger">@mensajeEliminarError</div>
-}
+        @if (!string.IsNullOrEmpty(mensajeEliminarError))
+        {
+            <div class="alert alert-danger">@mensajeEliminarError</div>
+        }
 
-<h5>Crear nuevo</h5>
+        <h5>Crear nuevo</h5>
+        <EditForm Model="nuevo" OnValidSubmit="Crear" class="nuevo-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-<EditForm Model="nuevo" OnValidSubmit="Crear">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+            <div class="mb-2">
+                <label>Usuario</label>
+                <InputText class="form-control" @bind-Value="nuevo.UserName" />
+            </div>
+            <div class="mb-2">
+                <label>Contraseña</label>
+                <InputText type="password" class="form-control" @bind-Value="nuevo.Contraseña" />
+            </div>
+            <button type="submit">Crear</button>
+        </EditForm>
 
-    <div class="mb-2">
-        <label>Usuario</label>
-        <InputText class="form-control" @bind-Value="nuevo.UserName" />
+        @if (!string.IsNullOrEmpty(mensajeOk))
+        {
+            <div class="alert alert-success">@mensajeOk</div>
+        }
+
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger">@mensajeError</div>
+        }
     </div>
-    <div class="mb-2">
-        <label>Contraseña</label>
-        <InputText type="password" class="form-control" @bind-Value="nuevo.Contraseña" />
-    </div>
-    <button class="btn btn-primary" type="submit">Crear</button>
-</EditForm>
-
-@if (!string.IsNullOrEmpty(mensajeOk))
-{
-    <div class="alert alert-success">@mensajeOk</div>
-}
-
-@if (!string.IsNullOrEmpty(mensajeError))
-{
-    <div class="alert alert-danger">@mensajeError</div>
-}
+</div>
 
 @code {
     private List<UsuarioAdministrador>? usuarios;

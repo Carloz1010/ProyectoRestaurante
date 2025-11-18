@@ -3,6 +3,14 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
+<div class="logout-bg">
+    <div class="logout-container">
+        <div class="logout-title">Cerrando sesión</div>
+        <div class="logout-msg">Por favor espera un momento...</div>
+        <button class="logout-btn" disabled>Redirigiendo</button>
+    </div>
+</div>
+
 @code {
     protected override async Task OnInitializedAsync()
     {

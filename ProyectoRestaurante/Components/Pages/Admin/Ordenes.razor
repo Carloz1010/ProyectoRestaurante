@@ -5,47 +5,49 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject IOrdenesService OrdenesService
 
-<h3>Ordenes</h3>
-
-@if (ordenes is null)
-{
-	<p>Cargando…</p>
-}
-else if (ordenes.Count == 0)
-{
-
-	<p>No hay ordenes que mostrar.</p>
-}
-else
-{
-	<table class="table">
-		<thead>
-			<tr>
-				<th>#</th>
-				<th>Cliente</th>
-				<th>Fecha</th>
-				<th>Estado</th>
-				<th>Total</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var o in ordenes)
-			{
-				<tr>
-					<td>@o.Id</td>
-					<td>@o.ClienteNombre</td>
-					<td>@o.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
-					<td>@o.Estado</td>
-					<td>@o.Total.ToString("C")</td>
-					<td>
-						<a href="/admin/ordenes/@o.Id">Ver</a>
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-}
+<div class="ordenes-bg">
+    <div class="ordenes-container">
+        <h3 class="titulo-ordenes">Órdenes</h3>
+        @if (ordenes is null)
+        {
+            <p class="ordenes-msg">Cargando…</p>
+        }
+        else if (ordenes.Count == 0)
+        {
+            <p class="ordenes-msg">No hay órdenes que mostrar.</p>
+        }
+        else
+        {
+            <table class="ordenes-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in ordenes)
+                    {
+                        <tr>
+                            <td>@o.Id</td>
+                            <td>@o.ClienteNombre</td>
+                            <td>@o.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@o.Estado</td>
+                            <td>@o.Total.ToString("C")</td>
+                            <td>
+                                <a href="/admin/ordenes/@o.Id">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
 
 
 @code {

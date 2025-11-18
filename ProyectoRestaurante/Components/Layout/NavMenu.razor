@@ -3,63 +3,71 @@
 @inject AuthenticationStateProvider AuthState
 @implements IDisposable
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">ProyectoRestaurante</a>
-    </div>
-</div>
+<div class="fondo-catalogo">
+    <nav class="navbar navbar-expand-lg navbar-dark top-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">ProyectoRestaurante</a>
 
-<div class="nav-scrollable">
-    <nav class="flex-column">
-        @if (Autenticado)
-        {
-            @if (EsAdmin)
-            {
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/ordenes">
-                        <span class="bi bi-clipboard-data" aria-hidden="true"></span> Ordenes
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/usuarios">
-                        <span class="bi bi-people" aria-hidden="true"></span> Usuarios
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/creacion">
-                        <span class="bi bi-people" aria-hidden="true"></span> Crear productos y categorías
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/reportes">
-                        <span class="bi bi-people" aria-hidden="true"></span> Reportes
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin/logout">
-                        <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
-                    </NavLink>
-                </div>
-            }
-        }
-        else
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="catalogo">
-                    <span class="bi bi-list-ul" aria-hidden="true"></span> Catálogo
-                </NavLink>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (Autenticado)
+                    {
+                        @if (EsAdmin)
+                        {
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/admin/ordenes">
+                                    <span class="bi bi-clipboard-data" aria-hidden="true"></span> Ordenes
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/admin/usuarios">
+                                    <span class="bi bi-people" aria-hidden="true"></span> Usuarios
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/admin/creacion">
+                                    <span class="bi bi-people" aria-hidden="true"></span> Crear productos y categorías
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/admin/reportes">
+                                    <span class="bi bi-people" aria-hidden="true"></span> Reportes
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/admin/logout">
+                                    <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar sesión
+                                </NavLink>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/catalogo">
+                                <span class="bi bi-list-ul" aria-hidden="true"></span> Catálogo
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="/carrito">
+                                <span class="bi bi-cart-fill-nav-menu" aria-hidden="true"></span> Carrito
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link btn btn-warning text-dark ms-3" href="/admin/login">
+                                <span class="bi bi-person" aria-hidden="true"></span> Ingresar como administrador
+                            </NavLink>
+                        </li>
+                    }
+                </ul>
             </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="carrito">
-                    <span class="bi bi-cart-fill-nav-menu" aria-hidden="true"></span> Carrito
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/admin/login">
-                    <span class="bi bi-person" aria-hidden="true"></span> Ingresar como administrador
-                </NavLink>
-            </div>
-        }
+        </div>
     </nav>
 </div>
 
@@ -86,8 +94,7 @@
     }
 
     private bool Autenticado => user.Identity?.IsAuthenticated ?? false;
-
-    private bool EsAdmin => user.IsInRole("Admin"); // usando ClaimTypes.Role
+    private bool EsAdmin => user.IsInRole("Admin");
 
     public void Dispose()
     {
